@@ -1,28 +1,32 @@
 package requirements;
 
-import bankkata.Account;
-import bankkata.Console;
-import bankkata.TransactionRepo;
+import bankkata.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
+
 @RunWith(MockitoJUnitRunner.class)
 public class PrintStatementTest {
-    Console console= new Console();
+    @Mock private TodayDateProvider todayDateProvider;
+    @Mock Console console= new Console();
     private Account account;
 
     @Before
     public void setUp() {
-        TransactionRepo transactionRepo = new TransactionRepo();
-        account = new Account(transactionRepo);
+        StatementPrinter statementPrinter = new StatementPrinter(console);
+        TransactionRepo transactionRepo = new TransactionRepo(todayDateProvider);
+        account = new Account(transactionRepo, statementPrinter);
     }
 
     @Test
     public void shouldPrintAll() {
+        given(todayDateProvider.todayString()).willReturn("10/01/2012","13/01/2012","14/01/2012");
         account.deposit(1000);
         account.deposit(2000);
         account.withdraw(500);
